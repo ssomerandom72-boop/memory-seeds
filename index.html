@@ -4,184 +4,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Memory Seeds</title>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/react.min.js"></script>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/react-dom.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
-    .container { min-height: 100vh; background: linear-gradient(to bottom, #fef3c7, #f0fdf4, #eff6ff); padding: 16px 16px 96px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; margin-top: 16px; }
-    .header h1 { font-size: 30px; font-weight: bold; color: #065f46; font-family: Georgia, serif; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 16px; }
-    .tree-card { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
-    .tree-card:hover { border-color: #a7f3d0; }
-    .tree-card.expanded { grid-column: span 2; }
-    .tree-card.ripened { box-shadow: 0 0 0 2px #fcd34d; }
-    .tree-center { display: flex; flex-direction: column; align-items: center; }
-    .tree-name { margin-top: 12px; text-align: center; font-weight: 500; color: #1f2937; font-size: 14px; }
-    .tree-days { margin-top: 8px; font-size: 12px; color: #4b5563; }
-    .tree-days.ripened { color: #d97706; font-weight: 600; }
-    .stage-indicator { display: flex; gap: 4px; margin-top: 8px; }
-    .stage-dot { height: 6px; width: 8px; border-radius: 999px; background: #d1d5db; }
-    .stage-dot.active { background: #4ade80; }
-    .expanded-content { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .btn { padding: 12px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-    .btn-keep { background: #059669; color: white; flex: 1; }
-    .btn-keep:hover { background: #047857; }
-    .btn-discard { background: #d1d5db; color: #374151; flex: 1; }
-    .btn-discard:hover { background: #9ca3af; }
-    .btn-group { display: flex; gap: 8px; }
-    .fab { position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; background: linear-gradient(135deg, #4ade80, #16a34a); color: white; border: none; border-radius: 999px; font-size: 28px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: all 0.2s; }
-    .fab:hover { box-shadow: 0 15px 30px rgba(0,0,0,0.3); transform: scale(1.1); }
-    .fab:active { transform: scale(0.95); }
-    .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; margin-top: 16px; }
-    .modal-header button { padding: 8px; background: white; border: none; border-radius: 8px; cursor: pointer; font-size: 24px; }
-    .modal-header h2 { font-size: 24px; font-weight: bold; color: #065f46; font-family: Georgia, serif; }
-    .seed-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-    .seed-option { padding: 16px; border-radius: 16px; border: 2px solid #e5e7eb; background: white; cursor: pointer; transition: all 0.2s; text-align: left; }
-    .seed-option.selected { background: #d1fae5; border-color: #10b981; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .seed-option.selected:hover { border-color: #059669; }
-    .seed-option-name { font-weight: 500; color: #111827; }
-    .seed-option-desc { font-size: 12px; color: #6b7280; margin-top: 4px; }
-    .form-group { margin-bottom: 24px; }
-    .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px; }
-    .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
-    .form-input:focus { outline: none; box-shadow: 0 0 0 2px #4ade80; }
-    .photo-buttons { display: flex; gap: 12px; }
-    .photo-btn { flex: 1; padding: 16px; border: 2px dashed #86efac; border-radius: 8px; background: white; cursor: pointer; transition: all 0.2s; color: #059669; font-weight: 500; }
-    .photo-btn:hover { background: #f0fdf4; }
-    .btn-primary { width: 100%; padding: 16px; background: linear-gradient(90deg, #10b981, #059669); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; }
-    .btn-primary:hover { box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-    .settings-card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-    .settings-card h3 { font-weight: 500; color: #111827; margin-bottom: 16px; }
-    .radio-group { display: flex; flex-direction: column; gap: 12px; }
-    .radio-label { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; }
-    .radio-label:hover { background: #f9fafb; }
-    .radio-label span { font-size: 14px; color: #374151; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
   <script>
-    setTimeout(() => {
-      const { useState } = React;
+    const { useState } = React;
 
-      function MemorySeeds() {
-        const [screen, setScreen] = useState('forest');
-        const [seeds, setSeeds] = useState([
-          { id: 1, type: 'oak', name: 'Family Picnic', photos: 3, created: '2024-01-15', ripesOn: null, status: 'memory', daysUntil: null },
-          { id: 2, type: 'cherry', name: "Mom's Birthday", ripesOn: '2025-03-10', daysUntil: 28, status: 'growing' },
-          { id: 3, type: 'spruce', name: 'Submit Project', ripesOn: '2024-03-15', daysUntil: 0, status: 'ripened' },
-        ]);
-        const [expandedId, setExpandedId] = useState(null);
-        const [newSeed, setNewSeed] = useState({ type: 'oak', name: '', date: '' });
+    function MemorySeeds() {
+      const [screen, setScreen] = useState('forest');
+      const [seeds, setSeeds] = useState([]);
+      const [expandedId, setExpandedId] = useState(null);
+      const [newSeed, setNewSeed] = useState({ type: 'oak', name: '', date: '' });
 
-        const getTreeStage = (daysUntil, status) => {
-          if (status === 'ripened') return 4;
-          if (status === 'memory') return 5;
-          if (!daysUntil) return 1;
-          if (daysUntil > 60) return 1;
-          if (daysUntil > 30) return 2;
-          if (daysUntil > 0) return 3;
-          return 4;
-        };
+      const getTreeStage = (daysUntil, status) => {
+        if (status === 'ripened') return 4;
+        if (status === 'memory') return 5;
+        if (!daysUntil) return 5;
+        if (daysUntil > 60) return 1;
+        if (daysUntil > 30) return 2;
+        if (daysUntil > 0) return 3;
+        return 4;
+      };
 
-        const TreeSVG = ({ type, stage }) => {
-          if (type === 'oak' && stage === 5) {
-            return React.createElement('svg', { viewBox: '0 0 100 120', style: { width: '80px', height: '96px' } },
-              React.createElement('rect', { x: '42', y: '70', width: '16', height: '40', fill: '#8B6F47', rx: '2' }),
-              React.createElement('ellipse', { cx: '50', cy: '50', rx: '35', ry: '40', fill: '#2D5016' }),
-              React.createElement('ellipse', { cx: '30', cy: '45', rx: '20', ry: '25', fill: '#3A6B2C' }),
-              React.createElement('ellipse', { cx: '70', cy: '45', rx: '20', ry: '25', fill: '#3A6B2C' }),
-              React.createElement('ellipse', { cx: '50', cy: '25', rx: '15', ry: '18', fill: '#4A8C3C' }),
-              React.createElement('ellipse', { cx: '50', cy: '45', rx: '25', ry: '28', fill: '#4A8C3C', opacity: '0.4' })
-            );
-          }
-          if (type === 'cherry') {
-            const colors = [
-              { trunk: '#C4A692', leaf: '#E8D5C4' },
-              { trunk: '#B8956A', leaf: '#F0DCC4' },
-              { trunk: '#8B7355', leaf: '#F5E6D3' },
-              { trunk: '#8B7355', leaf: '#FFB6C1' },
-            ];
-            const c = colors[Math.min(stage - 1, 3)];
-            return React.createElement('svg', { viewBox: '0 0 100 120', style: { width: '80px', height: '96px' } },
-              React.createElement('rect', { x: '44', y: '75', width: '12', height: '40', fill: c.trunk, rx: '2' }),
-              React.createElement('circle', { cx: '50', cy: '55', r: 20 + stage * 2, fill: c.leaf, opacity: '0.8' }),
-              React.createElement('circle', { cx: '35', cy: '50', r: 12 + stage, fill: c.leaf, opacity: '0.7' }),
-              React.createElement('circle', { cx: '65', cy: '50', r: 12 + stage, fill: c.leaf, opacity: '0.7' }),
-              React.createElement('circle', { cx: '50', cy: '35', r: 10 + stage, fill: c.leaf, opacity: '0.9' })
-            );
-          }
-          if (type === 'spruce') {
-            const colors = ['#1B4D3E', '#2D6A5C', '#3D8B7D', '#4FA99F'];
-            const color = colors[Math.min(stage - 1, 3)];
-            return React.createElement('svg', { viewBox: '0 0 100 120', style: { width: '80px', height: '96px' } },
-              React.createElement('rect', { x: '44', y: '80', width: '12', height: '35', fill: '#5C4033', rx: '2' }),
-              React.createElement('polygon', { points: '50,20 30,65 70,65', fill: color }),
-              React.createElement('polygon', { points: '50,35 35,65 65,65', fill: colors[Math.min(stage - 1, 3)], opacity: '0.8' }),
-              React.createElement('polygon', { points: '50,50 40,75 60,75', fill: color, opacity: '0.9' })
-            );
-          }
-          return null;
-        };
-
-        const StageIndicator = ({ stage }) => {
-          return React.createElement('div', { className: 'stage-indicator' },
-            [1, 2, 3, 4, 5].map(s =>
-              React.createElement('div', { key: s, className: 'stage-dot' + (s <= stage ? ' active' : '') })
-            )
+      const TreeSVG = ({ type, stage }) => {
+        if (type === 'oak') {
+          return React.createElement('svg', { viewBox: '0 0 100 120', style: { width: '80px', height: '96px' } },
+            React.createElement('rect', { x: '42', y: '70', width: '16', height: '40', fill: '#8B6F47' }),
+            React.createElement('ellipse', { cx: '50', cy: '50', rx: '35', ry: '40', fill: '#2D5016' }),
+            React.createElement('ellipse', { cx: '30', cy: '45', rx: '20', ry: '25', fill: '#3A6B2C' }),
+            React.createElement('ellipse', { cx: '70', cy: '45', rx: '20', ry: '25', fill: '#3A6B2C' }),
+            React.createElement('ellipse', { cx: '50', cy: '25', rx: '15', ry: '18', fill: '#4A8C3C' })
           );
-        };
+        }
+        if (type === 'cherry') {
+          const colors = ['#E8D5C4', '#F0DCC4', '#F5E6D3', '#FFB6C1'];
+          const c = colors[Math.min(stage - 1, 3)];
+          return React.createElement('svg', { viewBox: '0 0 100 120', style: { width: '80px', height: '96px' } },
+            React.createElement('rect', { x: '44', y: '75', width: '12', height: '40', fill: '#8B7355' }),
+            React.createElement('circle', { cx: '50', cy: '55', r: 20 + stage * 2, fill: c, opacity: '0.8' }),
+            React.createElement('circle', { cx: '35', cy: '50', r: 12 + stage, fill: c, opacity: '0.7' }),
+            React.createElement('circle', { cx: '65', cy: '50', r: 12 + stage, fill: c, opacity: '0.7' }),
+            React.createElement('circle', { cx: '50', cy: '35', r: 10 + stage, fill: c, opacity: '0.9' })
+          );
+        }
+        if (type === 'spruce') {
+          const colors = ['#1B4D3E', '#2D6A5C', '#3D8B7D', '#4FA99F'];
+          const color = colors[Math.min(stage - 1, 3)];
+          return React.createElement('svg', { viewBox: '0 0 100 120', style: { width: '80px', height: '96px' } },
+            React.createElement('rect', { x: '44', y: '80', width: '12', height: '35', fill: '#5C4033' }),
+            React.createElement('polygon', { points: '50,20 30,65 70,65', fill: color }),
+            React.createElement('polygon', { points: '50,35 35,65 65,65', fill: color, opacity: '0.8' })
+          );
+        }
+      };
 
-        if (screen === 'forest') {
-          return React.createElement('div', { className: 'container' },
-            React.createElement('div', { className: 'header' },
-              React.createElement('h1', null, 'Your Forest'),
-              React.createElement('button', { onClick: () => setScreen('settings'), style: { background: 'white', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer', fontSize: '24px' } }, '⚙️')
-            ),
-            React.createElement('div', { className: 'grid' },
+      if (screen === 'forest') {
+        return React.createElement('div', { style: { minHeight: '100vh', background: 'linear-gradient(to bottom, #fef3c7, #dcfce7, #dbeafe)', padding: '1rem', paddingBottom: '6rem' } },
+          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', marginTop: '1rem' } },
+            React.createElement('h1', { style: { fontSize: '1.875rem', fontFamily: 'Georgia, serif', color: '#065f46' } }, 'Your Forest'),
+            React.createElement('button', { onClick: () => setScreen('settings'), style: { padding: '0.5rem', cursor: 'pointer', border: 'none', background: 'white', borderRadius: '0.5rem', fontSize: '1.25rem' } }, '⚙️')
+          ),
+          seeds.length === 0 ? 
+            React.createElement('div', { style: { textAlign: 'center', marginTop: '3rem' } },
+              React.createElement('p', { style: { fontSize: '3rem', marginBottom: '1rem' } }, '🌱'),
+              React.createElement('p', { style: { color: '#6b7280', fontSize: '1rem' } }, 'Your forest is empty'),
+              React.createElement('p', { style: { color: '#9ca3af', fontSize: '0.875rem', marginTop: '0.5rem' } }, 'Plant your first seed to get started')
+            )
+          :
+            React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem', marginBottom: '1rem' } },
               seeds.map(seed => {
                 const stage = getTreeStage(seed.daysUntil, seed.status);
                 const isExpanded = expandedId === seed.id;
-                return React.createElement('div', {
-                  key: seed.id,
-                  onClick: () => setExpandedId(isExpanded ? null : seed.id),
-                  style: { gridColumn: isExpanded ? 'span 2' : 'span 1' }
-                },
-                  React.createElement('div', {
-                    className: 'tree-card' + (isExpanded ? ' expanded' : '') + (seed.status === 'ripened' ? ' ripened' : '')
-                  },
-                    React.createElement('div', { className: 'tree-center' },
-                      React.createElement(TreeSVG, { type: seed.type, stage }),
-                      React.createElement('div', { className: 'tree-name' }, seed.name),
-                      React.createElement(StageIndicator, { stage }),
-                      seed.status !== 'memory' && React.createElement('div', { className: 'tree-days' + (seed.status === 'ripened' ? ' ripened' : '') },
-                        seed.status === 'ripened' ? '🌟 Ripened!' : seed.daysUntil + ' days'
+                return React.createElement('div', { key: seed.id, onClick: () => setExpandedId(isExpanded ? null : seed.id), style: { cursor: 'pointer' } },
+                  React.createElement('div', { style: { background: 'white', borderRadius: '1rem', padding: '1rem', boxShadow: '0 10px 15px rgba(0,0,0,0.1)', border: seed.status === 'ripened' ? '2px solid #fbbf24' : 'none' } },
+                    React.createElement('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } },
+                      React.createElement(TreeSVG, { type: seed.type, stage: stage }),
+                      React.createElement('h3', { style: { marginTop: '0.75rem', textAlign: 'center', fontSize: '0.875rem', color: '#374151' } }, seed.name),
+                      React.createElement('div', { style: { display: 'flex', gap: '0.25rem', marginTop: '0.5rem' } },
+                        [1,2,3,4,5].map(s => React.createElement('div', { key: s, style: { height: '6px', width: '8px', borderRadius: '9999px', background: s <= stage ? '#10b981' : '#d1d5db' } }))
                       ),
-                      isExpanded && React.createElement('div', { className: 'expanded-content' },
-                        seed.type === 'oak' && React.createElement('div', { style: { background: '#f0fdf4', borderRadius: '8px', padding: '12px' } },
-                          React.createElement('p', { style: { fontSize: '12px', color: '#047857' } }, '📸 ' + seed.photos + ' photos'),
-                          React.createElement('p', { style: { fontSize: '12px', color: '#059669', marginTop: '4px' } }, 'Captured: ' + seed.created)
-                        ),
-                        seed.status === 'ripened' && seed.type !== 'oak' && React.createElement('div', { className: 'btn-group' },
-                          React.createElement('button', {
-                            className: 'btn btn-keep',
-                            onClick: (e) => {
-                              e.stopPropagation();
-                              setSeeds(seeds.map(s => s.id === seed.id ? { ...s, status: 'archived' } : s));
-                              setExpandedId(null);
-                            }
-                          }, '✓ Keep'),
-                          React.createElement('button', {
-                            className: 'btn btn-discard',
-                            onClick: (e) => {
-                              e.stopPropagation();
-                              setSeeds(seeds.filter(s => s.id !== seed.id));
-                              setExpandedId(null);
-                            }
-                          }, '✕ Discard')
+                      seed.status !== 'memory' && React.createElement('div', { style: { marginTop: '0.5rem', fontSize: '0.75rem', color: '#4b5563' } },
+                        seed.status === 'ripened' ? React.createElement('span', { style: { color: '#b45309', fontWeight: 'bold' } }, '🌟 Ripened!') : seed.daysUntil + ' days'
+                      ),
+                      isExpanded && React.createElement('div', { style: { marginTop: '1rem', width: '100%', borderTop: '1px solid #e5e7eb', paddingTop: '1rem' } },
+                        seed.type === 'oak' && React.createElement('div', { style: { background: '#f0fdf4', borderRadius: '0.5rem', padding: '0.75rem', fontSize: '0.75rem', color: '#065f46' } }, '📸 ' + (seed.photos || 0) + ' photos'),
+                        seed.status === 'ripened' && React.createElement('div', { style: { display: 'flex', gap: '0.5rem', marginTop: '0.75rem' } },
+                          React.createElement('button', { onClick: (e) => { e.stopPropagation(); setSeeds(seeds.map(s => s.id === seed.id ? { ...s, status: 'archived' } : s)); setExpandedId(null); }, style: { flex: 1, background: '#059669', color: 'white', padding: '0.5rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontSize: '0.75rem' } }, '✓ Keep'),
+                          React.createElement('button', { onClick: (e) => { e.stopPropagation(); setSeeds(seeds.filter(s => s.id !== seed.id)); setExpandedId(null); }, style: { flex: 1, background: '#d1d5db', color: '#374151', padding: '0.5rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontSize: '0.75rem' } }, '✕ Discard')
                         )
                       )
                     )
@@ -189,109 +106,70 @@
                 );
               })
             ),
-            React.createElement('button', {
-              className: 'fab',
-              onClick: () => setScreen('plant')
-            }, '+')
-          );
-        }
-
-        if (screen === 'plant') {
-          return React.createElement('div', { className: 'container' },
-            React.createElement('div', { className: 'modal-header' },
-              React.createElement('button', { onClick: () => setScreen('forest') }, '✕'),
-              React.createElement('h2', null, 'Plant a Seed')
-            ),
-            React.createElement('div', { className: 'seed-options' },
-              [
-                { id: 'oak', name: '🌳 Great Oak', desc: 'A cherished past memory' },
-                { id: 'cherry', name: '🌸 Cherry Blossom', desc: 'Birthday or annual event' },
-                { id: 'spruce', name: '🌲 Dark Spruce', desc: 'Something to remember' },
-              ].map(t =>
-                React.createElement('button', {
-                  key: t.id,
-                  className: 'seed-option' + (newSeed.type === t.id ? ' selected' : ''),
-                  onClick: () => setNewSeed({ ...newSeed, type: t.id })
-                },
-                  React.createElement('div', { className: 'seed-option-name' }, t.name),
-                  React.createElement('div', { className: 'seed-option-desc' }, t.desc)
-                )
-              )
-            ),
-            React.createElement('div', { className: 'form-group' },
-              React.createElement('label', { className: 'form-label' }, "What's this memory called?"),
-              React.createElement('input', {
-                type: 'text',
-                className: 'form-input',
-                placeholder: 'e.g., Family Picnic...',
-                value: newSeed.name,
-                onChange: (e) => setNewSeed({ ...newSeed, name: e.target.value })
-              })
-            ),
-            newSeed.type !== 'oak' && React.createElement('div', { className: 'form-group' },
-              React.createElement('label', { className: 'form-label' }, 'When should it ripen?'),
-              React.createElement('input', {
-                type: 'date',
-                className: 'form-input',
-                value: newSeed.date,
-                onChange: (e) => setNewSeed({ ...newSeed, date: e.target.value })
-              })
-            ),
-            React.createElement('button', {
-              className: 'btn-primary',
-              onClick: () => {
-                if (newSeed.name && (newSeed.type === 'oak' || newSeed.date)) {
-                  const newId = Math.max(...seeds.map(s => s.id), 0) + 1;
-                  const ripesOn = newSeed.date || null;
-                  const daysUntil = ripesOn ? Math.ceil((new Date(ripesOn) - new Date()) / (1000 * 60 * 60 * 24)) : null;
-                  setSeeds([...seeds, { id: newId, type: newSeed.type, name: newSeed.name, ripesOn, daysUntil, status: 'growing', created: new Date().toISOString().split('T')[0], photos: 1 }]);
-                  setNewSeed({ type: 'oak', name: '', date: '' });
-                  setScreen('forest');
-                }
-              }
-            }, '🌱 Plant This Seed')
-          );
-        }
-
-        if (screen === 'settings') {
-          return React.createElement('div', { className: 'container' },
-            React.createElement('div', { className: 'modal-header' },
-              React.createElement('button', { onClick: () => setScreen('forest') }, '✕'),
-              React.createElement('h2', null, 'Settings')
-            ),
-            React.createElement('div', { className: 'settings-card' },
-              React.createElement('h3', null, 'Daily Alert'),
-              React.createElement('div', { className: 'radio-group' },
-                [
-                  { id: 'all', label: 'Show all ripened trees' },
-                  { id: 'random', label: 'Random reflection' },
-                  { id: 'none', label: 'No alerts' },
-                ].map(opt =>
-                  React.createElement('label', { key: opt.id, className: 'radio-label' },
-                    React.createElement('input', { type: 'radio', name: 'alert', defaultChecked: opt.id === 'all' }),
-                    React.createElement('span', null, opt.label)
-                  )
-                )
-              )
-            ),
-            React.createElement('div', { className: 'settings-card' },
-              React.createElement('h3', null, 'Notification Sound'),
-              React.createElement('label', { className: 'radio-label' },
-                React.createElement('input', { type: 'checkbox', defaultChecked: true }),
-                React.createElement('span', null, 'Soft chime when tree ripens')
-              )
-            ),
-            React.createElement('div', { className: 'settings-card' },
-              React.createElement('h3', null, 'Family Groups'),
-              React.createElement('button', { className: 'btn-primary', style: { background: 'white', border: '2px dashed #86efac', color: '#059669' } }, '+ Create a Family Group')
-            )
-          );
-        }
+          React.createElement('button', { onClick: () => setScreen('plant'), style: { position: 'fixed', bottom: '1.5rem', right: '1.5rem', width: '64px', height: '64px', background: 'linear-gradient(to bottom right, #4ade80, #059669)', color: 'white', border: 'none', borderRadius: '9999px', fontSize: '1.75rem', cursor: 'pointer', boxShadow: '0 20px 25px rgba(0,0,0,0.2)' } }, '+')
+        );
       }
 
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(React.createElement(MemorySeeds));
-    }, 100);
+      if (screen === 'plant') {
+        return React.createElement('div', { style: { minHeight: '100vh', background: 'linear-gradient(to bottom, #fef3c7, #dbeafe)', padding: '1rem', paddingBottom: '6rem' } },
+          React.createElement('div', { style: { display: 'flex', gap: '0.75rem', marginBottom: '2rem', marginTop: '1rem' } },
+            React.createElement('button', { onClick: () => setScreen('forest'), style: { padding: '0.5rem', border: 'none', background: 'white', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '1.25rem' } }, '✕'),
+            React.createElement('h2', { style: { fontSize: '1.5rem', fontFamily: 'Georgia, serif', color: '#065f46' } }, 'Plant a Seed')
+          ),
+          React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' } },
+            [
+              { id: 'oak', name: '🌳 Great Oak', desc: 'A cherished past memory' },
+              { id: 'cherry', name: '🌸 Cherry Blossom', desc: 'Birthday or annual event' },
+              { id: 'spruce', name: '🌲 Dark Spruce', desc: 'Something to remember' },
+            ].map(t =>
+              React.createElement('button', { key: t.id, onClick: () => setNewSeed({ ...newSeed, type: t.id }), style: { padding: '1rem', borderRadius: '1rem', textAlign: 'left', border: newSeed.type === t.id ? '2px solid #10b981' : '2px solid #e5e7eb', background: newSeed.type === t.id ? '#ecfdf5' : 'white', cursor: 'pointer' } },
+                React.createElement('div', { style: { fontWeight: '500', color: '#111827' } }, t.name),
+                React.createElement('div', { style: { fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' } }, t.desc)
+              )
+            )
+          ),
+          React.createElement('div', { style: { marginBottom: '1.5rem' } },
+            React.createElement('label', { style: { display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' } }, 'Memory name'),
+            React.createElement('input', { type: 'text', placeholder: 'e.g., Family Picnic', value: newSeed.name, onChange: (e) => setNewSeed({ ...newSeed, name: e.target.value }), style: { width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontFamily: 'inherit' } })
+          ),
+          newSeed.type !== 'oak' && React.createElement('div', { style: { marginBottom: '1.5rem' } },
+            React.createElement('label', { style: { display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' } }, 'Ripening date'),
+            React.createElement('input', { type: 'date', value: newSeed.date, onChange: (e) => setNewSeed({ ...newSeed, date: e.target.value }), style: { width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontFamily: 'inherit' } })
+          ),
+          React.createElement('button', { onClick: () => { if (newSeed.name && (newSeed.type === 'oak' || newSeed.date)) { setSeeds([...seeds, { id: Math.max(...seeds.map(s => s.id), 0) + 1, type: newSeed.type, name: newSeed.name, status: 'growing', daysUntil: newSeed.date ? Math.ceil((new Date(newSeed.date) - new Date()) / (1000 * 60 * 60 * 24)) : null, photos: 0, created: new Date().toISOString().split('T')[0] }]); setNewSeed({ type: 'oak', name: '', date: '' }); setScreen('forest'); } }, style: { width: '100%', padding: '1rem', background: 'linear-gradient(to right, #10b981, #059669)', color: 'white', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: '500' } }, '🌱 Plant This Seed')
+        );
+      }
+
+      if (screen === 'settings') {
+        return React.createElement('div', { style: { minHeight: '100vh', background: 'linear-gradient(to bottom, #fef3c7, #dbeafe)', padding: '1rem', paddingBottom: '6rem' } },
+          React.createElement('div', { style: { display: 'flex', gap: '0.75rem', marginBottom: '2rem', marginTop: '1rem' } },
+            React.createElement('button', { onClick: () => setScreen('forest'), style: { padding: '0.5rem', border: 'none', background: 'white', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '1.25rem' } }, '✕'),
+            React.createElement('h2', { style: { fontSize: '1.5rem', fontFamily: 'Georgia, serif', color: '#065f46' } }, 'Settings')
+          ),
+          React.createElement('div', { style: { background: 'white', borderRadius: '1rem', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 10px 15px rgba(0,0,0,0.1)' } },
+            React.createElement('h3', { style: { fontWeight: '500', color: '#111827', marginBottom: '1rem' } }, 'Daily Alerts'),
+            React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '0.75rem' } },
+              ['Show all ripened trees', 'Random reflection', 'No alerts'].map(opt =>
+                React.createElement('label', { key: opt, style: { display: 'flex', gap: '0.75rem', padding: '0.75rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', cursor: 'pointer' } },
+                  React.createElement('input', { type: 'radio', name: 'alert', defaultChecked: opt === 'Show all ripened trees' }),
+                  React.createElement('span', { style: { fontSize: '0.875rem', color: '#374151' } }, opt)
+                )
+              )
+            )
+          ),
+          React.createElement('div', { style: { background: 'white', borderRadius: '1rem', padding: '1.5rem', boxShadow: '0 10px 15px rgba(0,0,0,0.1)' } },
+            React.createElement('h3', { style: { fontWeight: '500', color: '#111827', marginBottom: '1rem' } }, 'Notifications'),
+            React.createElement('label', { style: { display: 'flex', gap: '0.75rem', cursor: 'pointer' } },
+              React.createElement('input', { type: 'checkbox', defaultChecked: true }),
+              React.createElement('span', { style: { fontSize: '0.875rem', color: '#374151' } }, 'Soft chime when tree ripens')
+            )
+          )
+        );
+      }
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(MemorySeeds));
   </script>
 </body>
 </html>
